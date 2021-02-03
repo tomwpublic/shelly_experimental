@@ -1,0 +1,190 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly Uni", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Configuration"
+        capability "Initialize"
+        capability "Refresh"
+        
+        command "disableLogin"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "ipAddress", "text", title: "IP address of Shelly device", required: true
+        input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: false
+    }
+    section
+    {
+        input "username", "text", title: "Username to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct username here.", required: false
+        input "password", "text", title: "Password to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct password here.", required: false
+        input "refreshInterval", "number", title: "Refresh interval (seconds)", defaultValue: 10, required: true
+    }
+}
+
+def logDebug(msg) 
+{
+    if (logEnable)
+    {
+        log.debug(msg)
+    }
+}
+
+def initialize()
+{
+    refresh()
+}
+
+def updated()
+{
+    configure()
+}
+
+def configure()
+{
+    unschedule()
+    
+    try
+    {
+        state.clear()
+        state.childrenDnis = 
+            [
+                common: "",
+                relay0: "",
+                relay1: "",
+                adc0: "",
+                input0: "",
+                input1: ""
+            ]
+        
+        for(child in getChildDevices())
+        {
+            deleteChildDevice(child.getDeviceNetworkId())
+        }
+        
+        createAndConfigCommon()
+        
+        def settings = getCommon().readSettings(true)
+        
+        def child
+        def dni
+        
+        settings?.adcs?.eachWithIndex
+        { it, i ->
+            def alias = "adc${i}"
+            dni = genDniFormat(alias)
+            child = addChildDevice("Shelly ADC Child", dni, [isComponent: false, name: alias, label: alias])
+            child.setupDetails([adcNum: i.toString()])
+            state.childrenDnis[(alias)] = dni
+        }
+        
+        settings?.relays?.eachWithIndex
+        { it, i ->
+            def alias = "relay${i}"
+            dni = genDniFormat(alias)
+            child = addChildDevice("Shelly Relay Child", dni, [isComponent: false, name: alias, label: alias])
+            child.setupDetails([relayNum: i.toString()])
+            state.childrenDnis[(alias)] = dni
+        }
+        
+        [0, 1].eachWithIndex
+        { it, i ->
+            def alias = "input${i}"
+            dni = genDniFormat(alias)
+            child = addChildDevice("Shelly Input Child", dni, [isComponent: false, name: alias, label: alias])
+            child.setupDetails([inputNum: i.toString()])
+            state.childrenDnis[(alias)] = dni
+        }
+        
+        device.setDeviceNetworkId(settings.device.mac)
+        setCallbackURLs()
+        
+        initialize()
+    }
+    catch (Exception e)
+    {
+        logDebug("configure() failed: ${e.message}")
+    }
+}
+
+def pushEventFromChild(name, value)
+{
+    sendEvent(name: name, value: value)
+}
+
+def refresh(useCachedValues)
+{
+    unschedule()  
+    
+    for(child in getChildDevices())
+    {
+        child.refresh()
+    }
+    
+    runIn(refreshInterval.toFloat().toInteger(), refresh)
+}
+
+def uninstalled()
+{
+    unschedule()
+}
+
+def disableLogin()
+{
+    getCommon()?.disableLogin()
+}
+
+def createAndConfigCommon()
+{
+    def tempId = new Date().getTime().toString()
+    
+    // placeholder DNI to query for MAC    
+    def child = addChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common"])
+    child.setupDetails([ipAddress: ipAddress, username: username, password: password])    
+    def settings = child.readSettings(false)
+    
+    // set to actual MAC-based DNI and continue with config
+    def commonDni = genDniFormat("common", settings.device.mac)
+    child.setupDetails([ipAddress: ipAddress, username: username, password: password, dni: commonDni])
+    
+    // save away these details
+    state.childrenDnis.common = commonDni
+    state.mac = settings.device.mac
+}
+
+def getCommon()
+{
+    return getChildDevice(state.childrenDnis.common)
+}
+
+def genDniFormat(prefix, mac = null)
+{
+    return prefix + "-" + (mac ? mac : state.mac)
+}
+
+def setCallbackURLs()
+{
+    def hubURL = "http://${location.hub.localIP}:${location.hub.localSrvPortTCP}"
+    logDebug("setCallBackURLs() hubURL = ${hubURL}")
+    
+    for(child in getChildDevices())
+    {
+        child.setCallbackURLs(hubURL)
+    }
+}
+
+def parse(resp)
+{
+    // handle replies from the device
+    logDebug("Shelly device message received")
+    
+    // just refresh() on any change
+    refresh()
+}
