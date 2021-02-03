@@ -1,0 +1,45 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly ADC Child", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Refresh"
+        capability "VoltageMeasurement"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "adcNum", "text", title: "ADC number of this child", required: true
+    }
+}
+
+def setupDetails(details)
+{
+    device.updateSetting("adcNum", details.adcNum)
+}
+
+def setCallbackURLs(URL)
+{
+    getParent()?.getCommon()?.writeSettingAction("adc_over_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("adc_under_url", relayNum.toInteger(), URL, true)
+}
+
+def refresh()
+{
+    def adc = readADC()
+    if(adc)
+    {
+        sendEvent(name: "voltage", value: adc.voltage)
+    }
+}
+
+def readADC()
+{
+    return getParent()?.getCommon()?.readStatus(false)?.adcs[adcNum.toInteger()]
+}
