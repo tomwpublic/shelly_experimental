@@ -1,0 +1,45 @@
+{
+  "packageName": "shelly_experimental",
+  "author": "tomw",
+  "version": "0.0.1",
+  "minimumHEVersion": "2.1.9",
+  "dateReleased": "2021-02-03",
+  "drivers": [
+    {
+      "id": "f4e1fc53-697d-497c-90f1-6d40e5f6ef87",
+      "name": "Shelly Common",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyCommon",
+      "required": true
+    },
+    {
+      "id": "68cfa6a3-dd91-4eb8-89cd-9e830be3bedf",
+      "name": "Shelly Relay Child",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyRelayChild",
+      "required": true
+    },
+    {
+      "id": "ab829702-89e7-4929-9e95-fb9cfe3bc1b7",
+      "name": "Shelly Input Child",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyInputChild",
+      "required": true
+    },
+    {
+      "id": "f0987848-5ff0-494a-ade7-b3085b06b2f3",
+      "name": "Shelly ADC Child",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyAdcChild",
+      "required": true
+    },
+    {
+      "id": "3d6d63b5-3f1e-46c9-822d-c3e9bf3e5723",
+      "name": "Shelly Uni",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyUni",
+      "required": true
+    }
+  ],
+  "releaseNotes": "0.0.1 - @tomw - Available for limited testing."
+}
