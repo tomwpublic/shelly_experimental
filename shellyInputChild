@@ -1,0 +1,61 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly Input Child", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Refresh"
+        capability "Switch"
+        
+        attribute "commStatus", "string"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "inputNum", "text", title: "Input number of this child", required: true
+    }
+}
+
+def setupDetails(details)
+{
+    device.updateSetting("inputNum", details.inputNum)
+}
+
+def setCallbackURLs(URL)
+{
+    getParent()?.getCommon()?.writeSettingAction("btn_on_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("btn_off_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("shortpush_url", relayNum.toInteger(), URL, true)
+}
+
+def on()
+{
+    // do nothing, but refresh anyway
+    runIn(1, refresh)
+}
+
+def off()
+{
+    // do nothing, but refresh anyway
+    runIn(1, refresh)
+}
+
+def refresh()
+{
+    def input = readInput()
+    if(input)
+    {
+        sendEvent(name: "switch", value: input.input ? "on" : "off")
+    }
+}
+
+def readInput()
+{
+    return getParent()?.getCommon()?.readStatus(false)?.inputs[inputNum.toInteger()]
+}
