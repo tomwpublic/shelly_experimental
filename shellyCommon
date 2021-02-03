@@ -1,0 +1,307 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly Common", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Initialize"
+        
+        attribute "commStatus", "string"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "ipAddress", "text", title: "IP address of Shelly device", required: true        
+        input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: false
+    }
+    section
+    {
+        input "username", "text", title: "Username to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct username here.", required: false
+        input "password", "text", title: "Password to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct password here.", required: false        
+    }
+}
+
+def logDebug(msg) 
+{
+    if (logEnable)
+    {
+        log.debug(msg)
+    }
+}
+
+def updated()
+{
+    configure()
+}
+
+def initialize()
+{
+    state.clear()
+    
+    def settings = readSettings(false)
+    
+    if(!settings)
+    {
+        return
+    }
+    
+    readShelly(false)
+    readStatus(false)
+}
+
+def refresh()
+{
+    readStatus(false)
+}
+
+def setupDetails(details)
+{
+    device.updateSetting("ipAddress", details.ipAddress)
+    
+    if(!details.dni)
+    {
+        // this is an empty device (IP only) so the parent can get the rest of the needed info to set up
+        return
+    }
+    
+    if(details.username && details.password)
+    {
+        if(enableLogin(details.username, details.password))
+        {
+            device.updateSetting("username", details.username)
+            device.updateSetting("password", details.password)
+        }
+    }
+    else
+    {
+        disableLogin()      
+    }
+    
+    if(details.dni)
+    {
+        device.setDeviceNetworkId(details.dni)
+    }
+}
+
+def setCallbackURLs(URL)
+{
+    // do nothing (for now?)
+}
+
+def enableLogin(username, password)
+{
+    return writeSetting("login/enabled", "true&username=${username}&password=${password}") 
+}
+
+def disableLogin()
+{
+    def success = writeSetting("login/enabled", "false&unprotected=true")
+    
+    if(success)
+    {
+        device.clearSetting("username")
+        device.clearSetting("password")
+    }
+    
+    return success
+}
+
+def readShelly(useCachedValues)
+{
+    if(useCachedValues)
+    {
+        return getShelly()
+    }
+    else
+    {
+        def resp_json = httpExec("GET", getParams(getBaseURI() + "shelly"))
+        if(resp_json)
+        {
+            setShelly(resp_json)
+            sendEvent(name: "commStatus", value: "good")
+            return resp_json
+        }
+        else
+        {
+            sendEvent(name: "commStatus", value: "error")
+        }
+    }
+}
+
+def setShelly(shelly)
+{
+    state.shelly = shelly
+}
+
+def getShelly()
+{
+    return state.shelly
+}
+
+def readSettings(useCachedValues)
+{
+    if(useCachedValues)
+    {
+        return getSettings()
+    }
+    else
+    {
+        def resp_json = httpExec("GET", getParams(getBaseURI() + "settings"))
+        if(resp_json)
+        {
+            setSettings(resp_json)
+            sendEvent(name: "commStatus", value: "good")
+            return resp_json
+        }
+        else
+        {
+            sendEvent(name: "commStatus", value: "error")
+        }
+    }
+}
+
+def setSettings(settings)
+{
+    state.settings = settings
+}
+
+def getSettings()
+{
+    return state.settings
+}
+
+def writeSetting(setting, value)
+{
+    def settings = setting.split("/")
+    
+    if(settings.size() == 1)
+    {
+        // single "setting = value" instance
+        return httpExec("GET", getParams(getBaseURI() + "settings?${setting}=${value}"))
+    }
+    else
+    {
+        // nested "category/setting = value" instance
+        def command = "settings"
+        for(i=0; i < (settings.size() - 1); i++)
+        {
+            command += "/${settings[i]}"
+        }
+        
+        command += "?${settings[settings.size() - 1]}=${value}"
+        
+        return httpExec("GET", getParams(getBaseURI() + command))
+    }            
+}
+
+def writeSettingAction(action, index, url, enable)
+{
+    return httpExec("GET", getParams(getBaseURI() + "settings/actions?index=${index.toString()}&name=${action}&enabled=${enable ? "true" : "false"}&urls[]=${url}"))
+}
+
+def readStatus(useCachedValues)
+{
+    if(useCachedValues)
+    {
+        return getStatus()
+    }
+    else
+    {
+        def resp_json = httpExec("GET", getParams(getBaseURI() + "status"))
+        if(resp_json)
+        {
+            setStatus(resp_json)
+            sendEvent(name: "commStatus", value: "good")
+            return resp_json
+        }
+        else
+        {
+            sendEvent(name: "commStatus", value: "error")
+        }
+    }
+}
+
+def setStatus(status)
+{
+    state.status = status
+}
+
+def getStatus()
+{
+    return state.status
+}
+
+def hitEntrypoint(suffix, throwToCaller = false)
+{
+    return httpExec("GET", getParams(getBaseURI() + suffix), throwToCaller)
+}
+
+def getBaseURI()
+{
+    return "http://" + ipAddress + "/"
+}
+
+def getParams(uri)
+{
+    def params = [:]
+    params["uri"] = uri
+    
+    if((username && (username != "")) && (password && (password != "")))
+    {
+        def userpass = "Basic " + ("${username}:${password}").bytes.encodeBase64().toString()
+        params["headers"] = [Authorization : userpass]
+    }
+    
+    return params
+}
+
+def httpGetExec(params, throwToCaller = false)
+{
+    logDebug("httpGetExec(${params})")
+    
+    try
+    {
+        def result
+        httpGet(params)
+        { resp ->
+            if (resp)
+            {
+                //logDebug("resp.data = ${resp.data}")
+                result = resp.data
+            }
+        }
+        return result
+    }
+    catch (Exception e)
+    {
+        logDebug("httpGetExec() failed: ${e.message}")
+        logDebug("status = ${e.getResponse().getStatus().toInteger()}")
+        if(throwToCaller)
+        {
+            throw(e)
+        }
+    }
+}
+
+def httpExec(operation, params, throwToCaller = false)
+{
+    def res
+    
+    switch(operation)
+    {
+        default:
+            logDebug("unsupported Http operation")
+            break
+        
+        case "GET":
+            res = httpGetExec(params, throwToCaller)
+            break
+    }
+    
+    return res
+}
