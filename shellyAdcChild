@@ -26,8 +26,8 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("adc_over_url", relayNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("adc_under_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("adc_over_url", adcNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("adc_under_url", adcNum.toInteger(), URL, true)
 }
 
 def refresh()
