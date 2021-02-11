@@ -28,10 +28,10 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("btn_on_url", relayNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("btn_off_url", relayNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("longpush_url", relayNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("shortpush_url", relayNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("btn_on_url", inputNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("btn_off_url", inputNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_url", inputNum.toInteger(), URL, true)
+    getParent()?.getCommon()?.writeSettingAction("shortpush_url", inputNum.toInteger(), URL, true)
 }
 
 def on()
