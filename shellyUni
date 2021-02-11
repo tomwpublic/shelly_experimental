@@ -4,7 +4,7 @@
 
 metadata
 {
-    definition(name: "Shelly Uni", namespace: "tomw", author: "tomw", importUrl: "")
+    definition(name: "Shelly UNI", namespace: "tomw", author: "tomw", importUrl: "")
     {
         capability "Configuration"
         capability "Initialize"
@@ -121,7 +121,7 @@ def pushEventFromChild(name, value)
 
 def refresh(useCachedValues)
 {
-    unschedule()  
+    unschedule(refresh)  
     
     for(child in getChildDevices())
     {
