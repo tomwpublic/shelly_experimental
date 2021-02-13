@@ -74,13 +74,14 @@ def configure()
         def settings = getCommon().readSettings(true)
         
         def child
-        def dni
+        def dni, name
         
         settings?.adcs?.eachWithIndex
         { it, i ->
             def alias = "adc${i}"
             dni = genDniFormat(alias)
-            child = addChildDevice("Shelly ADC Child", dni, [isComponent: false, name: alias, label: alias])
+            name = genNameFormat(alias)
+            child = addChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([adcNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -89,7 +90,8 @@ def configure()
         { it, i ->
             def alias = "relay${i}"
             dni = genDniFormat(alias)
-            child = addChildDevice("Shelly Relay Child", dni, [isComponent: false, name: alias, label: alias])
+            name = genNameFormat(alias)
+            child = addChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([relayNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -98,7 +100,8 @@ def configure()
         { it, i ->
             def alias = "input${i}"
             dni = genDniFormat(alias)
-            child = addChildDevice("Shelly Input Child", dni, [isComponent: false, name: alias, label: alias])
+            name = genNameFormat(alias)
+            child = addChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([inputNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -167,6 +170,11 @@ def getCommon()
 def genDniFormat(prefix, mac = null)
 {
     return prefix + "-" + (mac ? mac : state.mac)
+}
+
+def genNameFormat(suffix)
+{
+    return device.name + "-" + suffix
 }
 
 def setCallbackURLs()
