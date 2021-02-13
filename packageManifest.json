@@ -1,7 +1,7 @@
 {
   "packageName": "shelly_experimental",
   "author": "tomw",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "minimumHEVersion": "2.1.9",
   "dateReleased": "2021-02-03",
   "drivers": [
@@ -41,5 +41,5 @@
       "required": true
     }
   ],
-  "releaseNotes": "0.0.2 - @tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - @tomw - Available for limited testing."
+  "releaseNotes": "0.0.3 - @tomw - Modify child names to include reference to parent.\n0.0.2 - @tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - @tomw - Available for limited testing."
 }
