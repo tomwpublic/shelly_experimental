@@ -25,6 +25,9 @@ preferences
 def setupDetails(details)
 {
     device.updateSetting("relayNum", details.relayNum)
+    
+    // write button type as "detached" so that output is software-controlled only
+    getParent()?.getCommon()?.writeSetting("relay/${details.relayNum}/btn_type", "detached")
 }
 
 def setCallbackURLs(URL)
