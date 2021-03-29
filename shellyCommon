@@ -280,7 +280,7 @@ def httpGetExec(params, throwToCaller = false)
     catch (Exception e)
     {
         logDebug("httpGetExec() failed: ${e.message}")
-        logDebug("status = ${e.getResponse().getStatus().toInteger()}")
+        //logDebug("status = ${e?.getResponse()?.getStatus()?.toInteger()}")
         if(throwToCaller)
         {
             throw(e)
