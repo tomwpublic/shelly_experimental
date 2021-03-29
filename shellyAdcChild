@@ -41,5 +41,5 @@ def refresh()
 
 def readADC()
 {
-    return getParent()?.getCommon()?.readStatus(false)?.adcs[adcNum.toInteger()]
+    return getParent()?.getCommon()?.readStatus(false)?.adcs?.getAt(adcNum.toInteger())
 }
