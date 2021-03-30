@@ -16,7 +16,7 @@ preferences
     section
     {
         input "adcNum", "text", title: "ADC number of this child", required: true
-        input name: "voltageOffset", type: "number", title: "Voltage Offset", description: "This setting compensates for an inaccurate voltage sensor.", defaultValue: "-0.4"
+        input name: "voltageOffset", type: "number", title: "Voltage Offset", description: "Add this voltage value to ADC readings to compensate for any offset.", defaultValue: "-0.4"
     }
 }
 
