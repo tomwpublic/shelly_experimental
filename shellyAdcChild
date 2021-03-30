@@ -16,6 +16,7 @@ preferences
     section
     {
         input "adcNum", "text", title: "ADC number of this child", required: true
+        input name: "voltageOffset", type: "number", title: "Voltage Offset", description: "This setting compensates for an inaccurate voltage sensor.", defaultValue: "-0.4"
     }
 }
 
@@ -35,7 +36,7 @@ def refresh()
     def adc = readADC()
     if(adc)
     {
-        sendEvent(name: "voltage", value: adc.voltage)
+        sendEvent(name: "voltage", value: adc.voltage + voltageOffset)
     }
 }
 
