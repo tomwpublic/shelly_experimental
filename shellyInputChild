@@ -57,5 +57,5 @@ def refresh()
 
 def readInput()
 {
-    return getParent()?.getCommon()?.readStatus(false)?.inputs[inputNum.toInteger()]
+    return getParent()?.getCommon()?.readStatus(false)?.inputs?.getAt(inputNum.toInteger())
 }
