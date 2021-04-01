@@ -38,13 +38,13 @@ def setCallbackURLs(URL)
 
 def on()
 {
-    getParent()?.getCommon()?.hitEntrypoint("relay/${relayNum}?turn=on", true)
+    getParent()?.getCommon()?.hitEntrypoint("relay/${relayNum}?turn=on")
     runIn(1, refresh)
 }
 
 def off()
 {
-    getParent()?.getCommon()?.hitEntrypoint("relay/${relayNum}?turn=off", true)
+    getParent()?.getCommon()?.hitEntrypoint("relay/${relayNum}?turn=off")
     runIn(1, refresh)
 }
 
