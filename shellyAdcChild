@@ -36,7 +36,7 @@ def refresh()
     def adc = readADC()
     if(adc)
     {
-        sendEvent(name: "voltage", value: adc.voltage + voltageOffset)
+        sendEvent(name: "voltage", value: adc.voltage.toFloat() + voltageOffset.toFloat())
     }
 }
 
