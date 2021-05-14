@@ -6,6 +6,7 @@ metadata
 {
     definition(name: "Shelly Relay Child", namespace: "tomw", author: "tomw", importUrl: "")
     {
+        capability "Actuator"
         capability "Refresh"
         capability "RelaySwitch"
         capability "Switch"
