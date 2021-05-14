@@ -6,6 +6,7 @@ metadata
 {
     definition(name: "Shelly UNI", namespace: "tomw", author: "tomw", importUrl: "")
     {
+        capability "Actuator"
         capability "Configuration"
         capability "Initialize"
         capability "Refresh"
