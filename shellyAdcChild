@@ -6,6 +6,7 @@ metadata
 {
     definition(name: "Shelly ADC Child", namespace: "tomw", author: "tomw", importUrl: "")
     {
+        capability "Actuator"
         capability "Refresh"
         capability "VoltageMeasurement"
     }
