@@ -1,0 +1,90 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly Button Child", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Actuator"
+        capability "DoubleTapableButton"
+        capability "HoldableButton"
+        capability "PushableButton"
+        capability "Refresh"
+        
+        attribute "commStatus", "string"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "inputNum", "text", title: "Input number of this child", required: true
+    }
+}
+
+def setupDetails(details)
+{
+    device.updateSetting("inputNum", details.inputNum)
+    sendEvent(name: "numberOfButtons", value: 1)
+}
+
+def setCallbackURLs(URL)
+{
+    getParent()?.getCommon()?.writeSettingAction("shortpush_url", inputNum.toInteger(), URL + "/button${inputNum}/S", true)
+    getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", inputNum.toInteger(), URL + "/button${inputNum}/SS", true)
+    getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", inputNum.toInteger() + "/button${inputNum}/SSS", URL, true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_url", inputNum.toInteger(), URL + "/button${inputNum}/L", true)
+}
+
+def parse(List header)
+{
+    if(eventsMap[header?.getAt(1)])
+    {
+        sendEvent(name: eventsMap[header[1]], value: inputNum.toInteger(), isStateChange: true)
+    }    
+}
+
+def push(buttonNumber = 0)
+{
+    parse(["button", "S"])
+}
+
+def doubleTap(buttonNumber = 0)
+{
+    (["button", "SS"])
+}
+
+def tripleTap(buttonNumber = 0)
+{
+    (["button", "SSS"])
+}
+
+def hold(buttonNumber = 0)
+{
+    (["button", "L"])
+}
+
+import groovy.transform.Field
+@Field Map eventsMap =
+    [
+        "S": "pushed",
+        "SS": "doubleTapped",
+        "SSS": "tripleTapped",
+        "L": "held"
+    ]
+
+def refresh()
+{
+    def input = readInput()
+    if(eventsMap[input?.event])
+    {
+        sendEvent(name: eventsMap[input.event], value: inputNum.toInteger(), isStateChange: true)
+    }
+}
+
+def readInput()
+{
+    return getParent()?.getCommon()?.readStatus(false)?.inputs?.getAt(inputNum.toInteger())
+}
