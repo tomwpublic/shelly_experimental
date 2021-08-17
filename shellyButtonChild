@@ -53,17 +53,17 @@ def push(buttonNumber = 0)
 
 def doubleTap(buttonNumber = 0)
 {
-    (["button", "SS"])
+    parse(["button", "SS"])
 }
 
 def tripleTap(buttonNumber = 0)
 {
-    (["button", "SSS"])
+    parse(["button", "SSS"])
 }
 
 def hold(buttonNumber = 0)
 {
-    (["button", "L"])
+    parse(["button", "L"])
 }
 
 import groovy.transform.Field
