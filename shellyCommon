@@ -17,7 +17,7 @@ preferences
     section
     {
         input "ipAddress", "text", title: "IP address of Shelly device", required: true        
-        input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: false
+        input name: "logEnable", type: "bool", title: "Enable debug logging", defaultValue: true
     }
     section
     {
