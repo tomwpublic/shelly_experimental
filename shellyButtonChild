@@ -10,7 +10,6 @@ metadata
         capability "DoubleTapableButton"
         capability "HoldableButton"
         capability "PushableButton"
-        capability "Refresh"
         
         attribute "commStatus", "string"
     }
@@ -32,10 +31,13 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("shortpush_url", inputNum.toInteger(), URL + "/button${inputNum}/S", true)
-    getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", inputNum.toInteger(), URL + "/button${inputNum}/SS", true)
-    getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", inputNum.toInteger() + "/button${inputNum}/SSS", URL, true)
-    getParent()?.getCommon()?.writeSettingAction("longpush_url", inputNum.toInteger(), URL + "/button${inputNum}/L", true)
+    // shelly buttons are 0..(n-1) and Hubitat are 1..n
+    def shellyButtonNum = inputNum.toInteger() - 1
+    
+    getParent()?.getCommon()?.writeSettingAction("shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/S", true)
+    getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SS", true)
+    getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SSS", true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
 }
 
 def parse(List header)
@@ -46,22 +48,22 @@ def parse(List header)
     }    
 }
 
-def push(buttonNumber = 0)
+def push(buttonNumber = 1)
 {
     parse(["button", "S"])
 }
 
-def doubleTap(buttonNumber = 0)
+def doubleTap(buttonNumber = 1)
 {
     parse(["button", "SS"])
 }
 
-def tripleTap(buttonNumber = 0)
+def tripleTap(buttonNumber = 1)
 {
     parse(["button", "SSS"])
 }
 
-def hold(buttonNumber = 0)
+def hold(buttonNumber = 1)
 {
     parse(["button", "L"])
 }
@@ -74,17 +76,3 @@ import groovy.transform.Field
         "SSS": "tripleTapped",
         "L": "held"
     ]
-
-def refresh()
-{
-    def input = readInput()
-    if(eventsMap[input?.event])
-    {
-        sendEvent(name: eventsMap[input.event], value: inputNum.toInteger(), isStateChange: true)
-    }
-}
-
-def readInput()
-{
-    return getParent()?.getCommon()?.readStatus(false)?.inputs?.getAt(inputNum.toInteger())
-}
