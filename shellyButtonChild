@@ -45,12 +45,15 @@ def setCallbackURLs(URL)
     getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
 }
 
-def parse(List header)
+def parse(List<String> header)
 {
-    if(eventsMap[header?.getAt(1)])
+    header.each
     {
-        sendEvent(name: eventsMap[header[1]], value: inputNum.toInteger(), isStateChange: true)
-    }    
+        if(eventsMap[it.getAt(1)])
+        {
+            sendEvent(name: eventsMap[it[1]], value: 1.toInteger(), isStateChange: true)
+        }
+    }
 }
 
 def push(buttonNumber = 1)
