@@ -151,6 +151,11 @@ def genNameFormat(suffix)
     return device.name + "-" + suffix
 }
 
+def getChildDni(alias)
+{
+    return state.childrenDnis[alias]
+}
+
 def setCallbackURLs()
 {
     def hubURL = "http://${location.hub.localIP}:${location.hub.localSrvPortTCP}"
