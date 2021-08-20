@@ -245,9 +245,12 @@ def parse(resp)
 {
     try
     {
+        logDebug("parse(${parseLanMessage(resp)})")
+        
         def header = parseLanMessage(resp)?.header
         header = header?.substring(header.indexOf('/') + 1)
-        header = header?.substring(0, header.indexOf("H") - 1)
+        header = header?.substring(0, header.indexOf("H") - 1)        
+        logDebug("header = ${header})")
         
         if(header?.size() == 0)
         {
@@ -260,7 +263,7 @@ def parse(resp)
             // path for callback URL is defined as:
             //    http://<hub IP>:39501/<device type>/<custom data per device type>
             //    so, we can always vector off the info after <device type> to the appropriate child type            
-            parent.getChildDevice(parent.genDniFormat(header[0])).parse(header)
+            parent.getChildDevice(parent.state.childrenDnis?.getAt(header[0]))?.parse(header)
         }            
     }
     catch(Exception e)
