@@ -26,7 +26,6 @@ preferences
     {
         input "username", "text", title: "Username to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct username here.", required: false
         input "password", "text", title: "Password to use.  If blank, authorization will not be newly enabled.  If it was previously enabled, you must enter the correct password here.", required: false
-        input "refreshInterval", "number", title: "Refresh interval (seconds)", defaultValue: 10, required: true
     }
 }
 
@@ -58,7 +57,7 @@ def configure()
         state.childrenDnis = 
             [
                 common: "",
-                button0: ""
+                button1: ""
             ]
         
         for(child in getChildDevices())
@@ -73,13 +72,13 @@ def configure()
         def child
         def dni, name        
         
-        [0].eachWithIndex
+        [1].eachWithIndex
         { it, i ->
-            def alias = "button${i}"
+            def alias = "button${it}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
             child = addChildDevice("Shelly Button Child", dni, [isComponent: false, name: name, label: name])
-            child.setupDetails([inputNum: i.toString()])
+            child.setupDetails([inputNum: it.toString()])
             state.childrenDnis[(alias)] = dni
         }
         
@@ -107,8 +106,6 @@ def refresh(useCachedValues)
     {
         child.refresh()
     }
-    
-    runIn(refreshInterval.toFloat().toInteger(), refresh)
 }
 
 def uninstalled()
