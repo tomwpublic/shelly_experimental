@@ -29,6 +29,11 @@ def setupDetails(details)
     sendEvent(name: "numberOfButtons", value: 1)
 }
 
+def refresh()
+{
+    // no-op, but here for compatibility
+}
+
 def setCallbackURLs(URL)
 {
     // shelly buttons are 0..(n-1) and Hubitat are 1..n
