@@ -49,9 +49,9 @@ def parse(List<String> header)
 {
     header.each
     {
-        if(eventsMap[it.getAt(1)])
+        if(eventsMap[it[1]])
         {
-            sendEvent(name: eventsMap[it[1]], value: 1.toInteger(), isStateChange: true)
+            sendEvent(name: eventsMap[it[1]], value: inputNum.toInteger(), isStateChange: true)
         }
     }
 }
