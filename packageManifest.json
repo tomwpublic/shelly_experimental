@@ -9,7 +9,7 @@
       "id": "f4e1fc53-697d-497c-90f1-6d40e5f6ef87",
       "name": "Shelly Common",
       "namespace": "tomw",
-      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/tomwpublic-button1_dev/shellyCommon",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyCommon",
       "required": true
     },
     {
@@ -37,7 +37,7 @@
       "id": "4bcba97d-7f26-4616-b1b8-b7d9d68baed3",
       "name": "Shelly Button Child",
       "namespace": "tomw",
-      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/tomwpublic-button1_dev/shellyButtonChild",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyButtonChild",
       "required": true
     },
     {
@@ -51,7 +51,7 @@
       "id": "369c82df1-46aa-41a5-887c-31cff3fa310f",
       "name": "Shelly Button1",
       "namespace": "tomw",
-      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/tomwpublic-button1_dev/shellyButton1",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyButton1",
       "required": false
     }
   ],
