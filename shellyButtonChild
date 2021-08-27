@@ -1,0 +1,86 @@
+/*
+
+ */
+
+metadata
+{
+    definition(name: "Shelly Button Child", namespace: "tomw", author: "tomw", importUrl: "")
+    {
+        capability "Actuator"
+        capability "DoubleTapableButton"
+        capability "HoldableButton"
+        capability "PushableButton"
+        
+        attribute "commStatus", "string"
+    }
+}
+
+preferences
+{
+    section
+    {
+        input "inputNum", "text", title: "Input number of this child", required: true
+    }
+}
+
+def setupDetails(details)
+{
+    device.updateSetting("inputNum", details.inputNum)
+    sendEvent(name: "numberOfButtons", value: 1)
+}
+
+def refresh()
+{
+    // no-op, but here for compatibility
+}
+
+def setCallbackURLs(URL)
+{
+    // shelly buttons are 0..(n-1) and Hubitat are 1..n
+    def shellyButtonNum = inputNum.toInteger() - 1
+    
+    getParent()?.getCommon()?.writeSettingAction("shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/S", true)
+    getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SS", true)
+    getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SSS", true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
+}
+
+def parse(List<String> header)
+{
+    header.each
+    {
+        if(eventsMap[it[1]])
+        {
+            sendEvent(name: eventsMap[it[1]], value: inputNum.toInteger(), isStateChange: true)
+        }
+    }
+}
+
+def push(buttonNumber = 1)
+{
+    parse(["button", "S"])
+}
+
+def doubleTap(buttonNumber = 1)
+{
+    parse(["button", "SS"])
+}
+
+def tripleTap(buttonNumber = 1)
+{
+    parse(["button", "SSS"])
+}
+
+def hold(buttonNumber = 1)
+{
+    parse(["button", "L"])
+}
+
+import groovy.transform.Field
+@Field Map eventsMap =
+    [
+        "S": "pushed",
+        "SS": "doubleTapped",
+        "SSS": "tripleTapped",
+        "L": "held"
+    ]

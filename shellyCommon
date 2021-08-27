@@ -241,6 +241,37 @@ def hitEntrypoint(suffix, throwToCaller = false)
     return httpExec("GET", getParams(getBaseURI() + suffix), throwToCaller)
 }
 
+def parse(resp)
+{
+    try
+    {
+        logDebug("parse(${parseLanMessage(resp)})")
+        
+        def header = parseLanMessage(resp)?.header
+        header = header?.substring(header.indexOf('/') + 1)
+        header = header?.substring(0, header.indexOf("H") - 1)  
+        header = header.split("/")
+        
+        if(header?.size() == 0)
+        {
+            // just refresh() on any simple change
+            parent.refresh()
+            return
+        }
+        else
+        {
+            // path for callback URL is defined as:
+            //    http://<hub IP>:39501/<device type>/<custom data per device type>
+            //    so, we can always vector off the info after <device type> to the appropriate child type            
+            parent.getChildDevice(parent.getChildDni(header[0]))?.parse([header])
+        }            
+    }
+    catch(Exception e)
+    {
+        logDebug("Shelly Common parse() failed: ${e.message}")
+    }
+}
+
 def getBaseURI()
 {
     return "http://" + ipAddress + "/"

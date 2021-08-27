@@ -1,7 +1,7 @@
 {
   "packageName": "shelly_experimental",
   "author": "tomw",
-  "version": "0.0.10",
+  "version": "0.0.20",
   "minimumHEVersion": "2.1.9",
   "dateReleased": "2021-02-03",
   "drivers": [
@@ -34,13 +34,27 @@
       "required": true
     },
     {
+      "id": "4bcba97d-7f26-4616-b1b8-b7d9d68baed3",
+      "name": "Shelly Button Child",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyButtonChild",
+      "required": true
+    },
+    {
       "id": "3d6d63b5-3f1e-46c9-822d-c3e9bf3e5723",
       "name": "Shelly Uni",
       "namespace": "tomw",
       "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyUni",
-      "required": true
+      "required": false
+    },
+    {
+      "id": "369c82df1-46aa-41a5-887c-31cff3fa310f",
+      "name": "Shelly Button1",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyButton1",
+      "required": false
     }
   ],
   "licenseFile": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/LICENSE",
-  "releaseNotes": "0.0.10 - @tomw - Limit display precision for ADC (user request).\n0.0.9 - @tomw - Added `capability Actuator` by request.\n0.0.7 - @tomw - Fix a couple of intermittent unhandled exceptions related to `Connection Timeout` situations.\n0.0.6 - @Sebastien - Add user parameter to ADC driver to compensate for voltage offset.\n0.0.5 - @tomw - Fix a couple of user-reported errors: ADC `Cannot invoke method` and Common `No signature of method`.\n0.0.4 - @tomw - Made button type `detached` so output can be software-controlled.\n0.0.3 - @tomw - Modify child names to include reference to parent.\n0.0.2 - @tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - @tomw - Available for limited testing."
+  "releaseNotes": "0.0.20 - tomw - Add Button1 and change URL callback format.\n0.0.10 - tomw - Limit display precision for ADC (user request).\n0.0.9 - tomw - Added `capability Actuator` by request.\n0.0.7 - tomw - Fix a couple of intermittent unhandled exceptions related to `Connection Timeout` situations.\n0.0.6 - Sebastien - Add user parameter to ADC driver to compensate for voltage offset.\n0.0.5 - tomw - Fix a couple of user-reported errors: ADC `Cannot invoke method` and Common `No signature of method`.\n0.0.4 - tomw - Made button type `detached` so output can be software-controlled.\n0.0.3 - tomw - Modify child names to include reference to parent.\n0.0.2 - tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - tomw - Available for limited testing."
 }
