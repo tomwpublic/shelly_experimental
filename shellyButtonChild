@@ -26,7 +26,7 @@ preferences
 def setupDetails(details)
 {
     device.updateSetting("inputNum", details.inputNum)
-    sendEvent(name: "numberOfButtons", value: 1)
+    sendEvent(name: "numberOfButtons", value: details.inputNum)
 }
 
 def refresh()
