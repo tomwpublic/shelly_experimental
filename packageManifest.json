@@ -53,6 +53,13 @@
       "namespace": "tomw",
       "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyButton1",
       "required": false
+    },
+    {
+      "id": "812933c2-d1e4-46a4-b937-f0c2c8a84008",
+      "name": "Shelly i3",
+      "namespace": "tomw",
+      "location": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/shellyI3",
+      "required": false
     }
   ],
   "licenseFile": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/LICENSE",
