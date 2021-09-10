@@ -7,8 +7,10 @@ metadata
     definition(name: "Shelly Button1", namespace: "tomw", author: "tomw", importUrl: "")
     {
         capability "Actuator"
+        capability "Battery"
         capability "Configuration"
         capability "Initialize"
+        capability "PowerSource"
         capability "Refresh"
         
         command "disableLogin"
@@ -98,13 +100,21 @@ def pushEventFromChild(name, value)
     sendEvent(name: name, value: value)
 }
 
-def refresh(useCachedValues)
+def refresh(useCachedValues = false)
 {
-    unschedule(refresh)  
+    unschedule(refresh)
     
-    for(child in getChildDevices())
+    // grab battery and powersource statuses
+    def status = getCommon()?.readStatus(useCachedValues)
+    def events = [[:]]
+    if(status)
     {
-        child.refresh()
+        events += [name: "battery", value: status.bat?.value?.toInteger() ?: "unknown"]
+        events += [name: "powerSource", value: status.charger == true ? "mains" : status.charger == false ? "battery" : "unknown"]
+        events.each
+        {
+            sendEvent(it)
+        }
     }
 }
 
@@ -172,5 +182,9 @@ def parse(resp)
     // handle replies from the device
     logDebug("Shelly device message received")
     
+    // refresh this device...
+    refresh()
+    
+    // ...then, use Common to forward on any child events
     getCommon().parse(resp)
 }
