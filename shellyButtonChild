@@ -11,6 +11,10 @@ metadata
         capability "HoldableButton"
         capability "PushableButton"
         
+        attribute "tripleTapped", "number"
+        attribute "shortPushedLongPushed", "number"
+        attribute "longPushedShortPushed", "number"
+        
         attribute "commStatus", "string"
     }
 }
@@ -43,6 +47,8 @@ def setCallbackURLs(URL)
     getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SS", true)
     getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SSS", true)
     getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
+    getParent()?.getCommon()?.writeSettingAction("shortpush_longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SL", true)
+    getParent()?.getCommon()?.writeSettingAction("longpush_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/LS", true)
 }
 
 def parse(List<String> header)
@@ -82,5 +88,7 @@ import groovy.transform.Field
         "S": "pushed",
         "SS": "doubleTapped",
         "SSS": "tripleTapped",
-        "L": "held"
+        "L": "held",
+        "SL": "shortPushedLongPushed",
+        "LS": "longPushedShortPushed"
     ]
