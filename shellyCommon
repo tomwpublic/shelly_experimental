@@ -208,14 +208,14 @@ def readStatus(useCachedValues)
 {
     if(useCachedValues)
     {
-        return getStatus()
+        return getStatusEx()
     }
     else
     {
         def resp_json = httpExec("GET", getParams(getBaseURI() + "status"))
         if(resp_json)
         {
-            setStatus(resp_json)
+            setStatusEx(resp_json)
             sendEvent(name: "commStatus", value: "good")
             return resp_json
         }
@@ -226,12 +226,12 @@ def readStatus(useCachedValues)
     }
 }
 
-def setStatus(status)
+def setStatusEx(status)
 {
     state.status = status
 }
 
-def getStatus()
+def getStatusEx()
 {
     return state.status
 }
