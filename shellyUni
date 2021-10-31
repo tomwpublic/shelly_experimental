@@ -12,6 +12,9 @@ metadata
         capability "Refresh"
         
         command "disableLogin"
+        
+        attribute "extTempSensorValue", "number"
+        attribute "extTempSensorPresent", "string"
     }
 }
 
@@ -126,10 +129,27 @@ def pushEventFromChild(name, value)
 def refresh(useCachedValues)
 {
     unschedule(refresh)  
-    
+
     for(child in getChildDevices())
     {
         child.refresh()
+    }
+    
+    // check for things like external temperature sensors
+    def status = getCommon()?.getStatusEx()
+    if(null != status)
+    {
+        if(status.ext_temperature && status.ext_sensors?.temperature_unit)
+        {
+            sendEvent(name: "extTempSensorPresent", value: true)
+            sendEvent(
+                name: "extTempSensorValue",
+                value: ("F" == status.ext_sensors.temperature_unit) ? status.ext_temperature."0".tF : status.ext_temperature."0".tC)
+        }
+        else
+        {
+            sendEvent(name: "extTempSensorPresent", value: false)
+        }
     }
     
     runIn(refreshInterval.toFloat().toInteger(), refresh)
