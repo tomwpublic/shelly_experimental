@@ -1,7 +1,7 @@
 {
   "packageName": "shelly_experimental",
   "author": "tomw",
-  "version": "0.0.22",
+  "version": "0.0.23",
   "minimumHEVersion": "2.1.9",
   "dateReleased": "2021-02-03",
   "drivers": [
@@ -63,5 +63,5 @@
     }
   ],
   "licenseFile": "https://raw.githubusercontent.com/tomwpublic/shelly_experimental/main/LICENSE",
-  "releaseNotes": "0.0.22 - tomw - Add external temp sensor support to UNI\n0.0.21 - tomw - Add battery and powerSource reporting for Button1\n0.0.20 - tomw - Add Button1 and change URL callback format.\n0.0.10 - tomw - Limit display precision for ADC (user request).\n0.0.9 - tomw - Added `capability Actuator` by request.\n0.0.7 - tomw - Fix a couple of intermittent unhandled exceptions related to `Connection Timeout` situations.\n0.0.6 - Sebastien - Add user parameter to ADC driver to compensate for voltage offset.\n0.0.5 - tomw - Fix a couple of user-reported errors: ADC `Cannot invoke method` and Common `No signature of method`.\n0.0.4 - tomw - Made button type `detached` so output can be software-controlled.\n0.0.3 - tomw - Modify child names to include reference to parent.\n0.0.2 - tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - tomw - Available for limited testing."
+  "releaseNotes": "0.0.23 - tomw - Add support for toggle mode to button devices\n0.0.22 - tomw - Add external temp sensor support to UNI\n0.0.21 - tomw - Add battery and powerSource reporting for Button1\n0.0.20 - tomw - Add Button1 and change URL callback format.\n0.0.10 - tomw - Limit display precision for ADC (user request).\n0.0.9 - tomw - Added `capability Actuator` by request.\n0.0.7 - tomw - Fix a couple of intermittent unhandled exceptions related to `Connection Timeout` situations.\n0.0.6 - Sebastien - Add user parameter to ADC driver to compensate for voltage offset.\n0.0.5 - tomw - Fix a couple of user-reported errors: ADC `Cannot invoke method` and Common `No signature of method`.\n0.0.4 - tomw - Made button type `detached` so output can be software-controlled.\n0.0.3 - tomw - Modify child names to include reference to parent.\n0.0.2 - tomw - Bugfixes for Shelly UNI action URLs.\n0.0.1 - tomw - Available for limited testing."
 }
