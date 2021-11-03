@@ -10,6 +10,8 @@ metadata
         capability "DoubleTapableButton"
         capability "HoldableButton"
         capability "PushableButton"
+        capability "RelaySwitch"
+        capability "Switch"
         
         attribute "tripleTapped", "number"
         attribute "shortPushedLongPushed", "number"
@@ -49,6 +51,8 @@ def setCallbackURLs(URL)
     getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
     getParent()?.getCommon()?.writeSettingAction("shortpush_longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SL", true)
     getParent()?.getCommon()?.writeSettingAction("longpush_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/LS", true)
+    getParent()?.getCommon()?.writeSettingAction("btn_on_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/ON", true)
+    getParent()?.getCommon()?.writeSettingAction("btn_off_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/OFF", true)
 }
 
 def parse(List<String> header)
@@ -57,7 +61,22 @@ def parse(List<String> header)
     {
         if(eventsMap[it[1]])
         {
+            // momentary events
             sendEvent(name: eventsMap[it[1]], value: inputNum.toInteger(), isStateChange: true)
+        }
+        else
+        {
+            // toggle events
+            switch(it[1])
+            {
+                case "ON":
+                    sendEvent(name: "switch", value: "on", isStateChange: true)
+                    break
+                
+                case "OFF":
+                    sendEvent(name: "switch", value: "off", isStateChange: true)
+                    break
+            }
         }
     }
 }
@@ -80,6 +99,16 @@ def tripleTap(buttonNumber = 1)
 def hold(buttonNumber = 1)
 {
     parse(["button", "L"])
+}
+
+def on()
+{
+    parse(["button", "ON"])
+}
+
+def off()
+{
+    parse(["button", "OFF"])
 }
 
 import groovy.transform.Field
