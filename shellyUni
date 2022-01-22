@@ -4,7 +4,7 @@
 
 metadata
 {
-    definition(name: "Shelly UNI", namespace: "tomw", author: "tomw", importUrl: "")
+    definition(name: "Shelly Uni", namespace: "tomw", author: "tomw", importUrl: "")
     {
         capability "Actuator"
         capability "Configuration"
@@ -48,6 +48,7 @@ def initialize()
 
 def updated()
 {
+    removeCommon()
     configure()
 }
 
@@ -57,23 +58,10 @@ def configure()
     
     try
     {
-        state.clear()
-        state.childrenDnis = 
-            [
-                common: "",
-                relay0: "",
-                relay1: "",
-                adc0: "",
-                input0: "",
-                input1: ""
-            ]
+        state.childrenDnis = state.childrenDnis ?: [:]
         
-        for(child in getChildDevices())
-        {
-            deleteChildDevice(child.getDeviceNetworkId())
-        }
-        
-        createAndConfigCommon()
+        // check if the child device exists, and create it if needed
+        getCommon() ?: createAndConfigCommon()
         
         def settings = getCommon().readSettings(true)
         
@@ -85,7 +73,7 @@ def configure()
             def alias = "adc${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = addChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([adcNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -95,7 +83,7 @@ def configure()
             def alias = "relay${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = addChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([relayNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -105,7 +93,7 @@ def configure()
             def alias = "input${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = addChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name])
             child.setupDetails([inputNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -119,6 +107,11 @@ def configure()
     {
         logDebug("configure() failed: ${e.message}")
     }
+}
+
+def manageChildDevice(type, dni, details)
+{
+    return getChildDevice(dni) ?: addChildDevice(type, dni, details)
 }
 
 def pushEventFromChild(name, value)
@@ -170,9 +163,16 @@ def createAndConfigCommon()
     def tempId = new Date().getTime().toString()
     
     // placeholder DNI to query for MAC    
-    def child = addChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common"])
+    def child = manageChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common"])
     child.setupDetails([ipAddress: ipAddress, username: username, password: password])    
     def settings = child.readSettings(false)
+    
+    if(!settings)
+    {
+        // we didn't get a response from Shelly, so clean up and return
+        deleteChildDevice(child.getDeviceNetworkId())
+        throw new Exception("failed to reach Shelly device")
+    }
     
     // set to actual MAC-based DNI and continue with config
     def commonDni = genDniFormat("common", settings.device.mac)
@@ -185,7 +185,17 @@ def createAndConfigCommon()
 
 def getCommon()
 {
-    return getChildDevice(state.childrenDnis.common)
+    return getChildDevice(state.childrenDnis?.common)
+}
+
+def removeCommon()
+{
+    def ch = getCommon()
+    if(ch)
+    {
+        deleteChildDevice(ch.getDeviceNetworkId())
+        state.childrenDnis?.common = null
+    }
 }
 
 def genDniFormat(prefix, mac = null)
