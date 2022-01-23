@@ -73,7 +73,7 @@ def configure()
             def alias = "adc${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = manageChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([adcNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -83,7 +83,7 @@ def configure()
             def alias = "relay${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = manageChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([relayNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -93,7 +93,7 @@ def configure()
             def alias = "input${i}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = manageChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([inputNum: i.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -111,7 +111,31 @@ def configure()
 
 def manageChildDevice(type, dni, details)
 {
-    return getChildDevice(dni) ?: addChildDevice(type, dni, details)
+    def child
+    
+    if(state.childrenDnis?.getAt(details.alias))
+    {
+        def oldDni = state.childrenDnis[(details.alias)]
+        
+        // if the oldDni exists, we want to try to update the existing device
+        def dniToUse = (oldDni != dni) ? oldDni : dni        
+        child = getChildDevice(dniToUse) ?: addChildDevice(type, dni, details)
+    }
+    else
+    {
+        // as far as we know, the child doesn't exist.  create it.
+        child = addChildDevice(type, dni, details)
+    }
+    
+    if(child)
+    {
+        child.setDeviceNetworkId(dni)
+        state.childrenDnis[(details.alias)] = dni
+        
+        return child
+    }
+    
+    return
 }
 
 def pushEventFromChild(name, value)
