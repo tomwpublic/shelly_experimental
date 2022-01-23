@@ -75,7 +75,6 @@ def configure()
             name = genNameFormat(alias)
             child = manageChildDevice("Shelly ADC Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([adcNum: i.toString()])
-            state.childrenDnis[(alias)] = dni
         }
         
         settings?.relays?.eachWithIndex
@@ -85,7 +84,6 @@ def configure()
             name = genNameFormat(alias)
             child = manageChildDevice("Shelly Relay Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([relayNum: i.toString()])
-            state.childrenDnis[(alias)] = dni
         }
         
         [0, 1].eachWithIndex
@@ -95,7 +93,6 @@ def configure()
             name = genNameFormat(alias)
             child = manageChildDevice("Shelly Input Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([inputNum: i.toString()])
-            state.childrenDnis[(alias)] = dni
         }
         
         device.setDeviceNetworkId(settings.device.mac)
@@ -187,7 +184,7 @@ def createAndConfigCommon()
     def tempId = new Date().getTime().toString()
     
     // placeholder DNI to query for MAC    
-    def child = manageChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common"])
+    def child = manageChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common", alias: "common"])
     child.setupDetails([ipAddress: ipAddress, username: username, password: password])    
     def settings = child.readSettings(false)
     
