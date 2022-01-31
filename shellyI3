@@ -55,21 +55,12 @@ def configure()
     
     try
     {
-        state.clear()
-        state.childrenDnis = 
-            [
-                common: "",
-                button1: ""
-            ]
-        
-        for(child in getChildDevices())
-        {
-            deleteChildDevice(child.getDeviceNetworkId())
-        }
+        state.childrenDnis = state.childrenDnis ?: [:]
         
         createAndConfigCommon()
         
-        def settings = getCommon().readSettings(true)
+        // check if the child device exists, and create it if needed
+        getCommon() ?: createAndConfigCommon()
         
         def child
         def dni, name        
@@ -79,7 +70,7 @@ def configure()
             def alias = "button${it}"
             dni = genDniFormat(alias)
             name = genNameFormat(alias)
-            child = addChildDevice("Shelly Button Child", dni, [isComponent: false, name: name, label: name])
+            child = manageChildDevice("Shelly Button Child", dni, [isComponent: false, name: name, label: name, alias: alias])
             child.setupDetails([inputNum: it.toString()])
             state.childrenDnis[(alias)] = dni
         }
@@ -93,6 +84,35 @@ def configure()
     {
         logDebug("configure() failed: ${e.message}")
     }
+}
+
+def manageChildDevice(type, dni, details)
+{
+    def child
+    
+    if(state.childrenDnis?.getAt(details.alias))
+    {
+        def oldDni = state.childrenDnis[(details.alias)]
+        
+        // if the oldDni exists, we want to try to update the existing device
+        def dniToUse = (oldDni != dni) ? oldDni : dni        
+        child = getChildDevice(dniToUse) ?: addChildDevice(type, dni, details)
+    }
+    else
+    {
+        // as far as we know, the child doesn't exist.  create it.
+        child = addChildDevice(type, dni, details)
+    }
+    
+    if(child)
+    {
+        child.setDeviceNetworkId(dni)
+        state.childrenDnis[(details.alias)] = dni
+        
+        return child
+    }
+    
+    return
 }
 
 def pushEventFromChild(name, value)
@@ -124,10 +144,17 @@ def createAndConfigCommon()
 {
     def tempId = new Date().getTime().toString()
     
-    // placeholder DNI to query for MAC    
-    def child = addChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common"])
+    // placeholder DNI to query for MAC
+    def child = manageChildDevice("Shelly Common", tempId, [isComponent: false, name: "common", label: "common", alias: "common"])
     child.setupDetails([ipAddress: ipAddress, username: username, password: password])    
     def settings = child.readSettings(false)
+    
+    if(!settings)
+    {
+        // we didn't get a response from Shelly, so clean up and return
+        deleteChildDevice(child.getDeviceNetworkId())
+        throw new Exception("failed to reach Shelly device")
+    }
     
     // set to actual MAC-based DNI and continue with config
     def commonDni = genDniFormat("common", settings.device.mac)
@@ -140,7 +167,17 @@ def createAndConfigCommon()
 
 def getCommon()
 {
-    return getChildDevice(state.childrenDnis.common)
+    return getChildDevice(state.childrenDnis?.common)
+}
+
+def removeCommon()
+{
+    def ch = getCommon()
+    if(ch)
+    {
+        deleteChildDevice(ch.getDeviceNetworkId())
+        state.childrenDnis?.common = null
+    }
 }
 
 def genDniFormat(prefix, mac = null)
