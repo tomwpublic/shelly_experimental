@@ -62,6 +62,8 @@ def configure()
         // check if the child device exists, and create it if needed
         getCommon() ?: createAndConfigCommon()
         
+        def settings = getCommon().readSettings(true)
+        
         def child
         def dni, name        
         
