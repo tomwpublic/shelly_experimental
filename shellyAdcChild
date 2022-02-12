@@ -28,8 +28,24 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("adc_over_url", adcNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("adc_under_url", adcNum.toInteger(), URL, true)
+    appendCallbackURLs("adc_over_url", URL)
+    appendCallbackURLs("adc_under_url", URL)
+}
+
+def appendCallbackURLs(name, URL)
+{
+    def actions = getParent()?.getCommon()?.readSettingAction()?.actions
+    
+    // don't overwrite existing URLs, in case they were important to the user
+    def existingUrls = actions?.getAt(name)?.getAt(adcNum.toInteger())?.getAt("urls")  
+    if(!existingUrls?.contains(URL.toString()))
+    {
+        existingUrls += URL
+    }
+    
+    URL = existingUrls.collect{it}.join("&urls[]=")
+    
+    getParent()?.getCommon()?.writeSettingAction(name, adcNum.toInteger(), URL, true)
 }
 
 def refresh()

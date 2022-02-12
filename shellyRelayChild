@@ -33,8 +33,24 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("out_on_url", relayNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("out_off_url", relayNum.toInteger(), URL, true)
+    appendCallbackURLs("out_on_url", URL)
+    appendCallbackURLs("out_off_url", URL)
+}
+
+def appendCallbackURLs(name, URL)
+{
+    def actions = getParent()?.getCommon()?.readSettingAction()?.actions
+    
+    // don't overwrite existing URLs, in case they were important to the user
+    def existingUrls = actions?.getAt(name)?.getAt(relayNum.toInteger())?.getAt("urls")  
+    if(!existingUrls?.contains(URL.toString()))
+    {
+        existingUrls += URL
+    }
+    
+    URL = existingUrls.collect{it}.join("&urls[]=")
+    
+    getParent()?.getCommon()?.writeSettingAction(name, relayNum.toInteger(), URL, true)
 }
 
 def on()

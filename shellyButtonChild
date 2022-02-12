@@ -42,17 +42,33 @@ def refresh()
 
 def setCallbackURLs(URL)
 {
+    appendCallbackURLs("shortpush_url", URL + "/button${inputNum.toInteger()}/S")
+    appendCallbackURLs("double_shortpush_url", URL + "/button${inputNum.toInteger()}/SS")
+    appendCallbackURLs("triple_shortpush_url", URL + "/button${inputNum.toInteger()}/SSS")
+    appendCallbackURLs("longpush_url", URL + "/button${inputNum.toInteger()}/L")
+    appendCallbackURLs("shortpush_longpush_url", URL + "/button${inputNum.toInteger()}/SL")
+    appendCallbackURLs("longpush_shortpush_url", URL + "/button${inputNum.toInteger()}/LS")
+    appendCallbackURLs("btn_on_url", URL + "/button${inputNum.toInteger()}/ON")
+    appendCallbackURLs("btn_off_url", URL + "/button${inputNum.toInteger()}/OFF")
+}
+
+def appendCallbackURLs(name, URL)
+{
     // shelly buttons are 0..(n-1) and Hubitat are 1..n
     def shellyButtonNum = inputNum.toInteger() - 1
     
-    getParent()?.getCommon()?.writeSettingAction("shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/S", true)
-    getParent()?.getCommon()?.writeSettingAction("double_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SS", true)
-    getParent()?.getCommon()?.writeSettingAction("triple_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SSS", true)
-    getParent()?.getCommon()?.writeSettingAction("longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/L", true)
-    getParent()?.getCommon()?.writeSettingAction("shortpush_longpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/SL", true)
-    getParent()?.getCommon()?.writeSettingAction("longpush_shortpush_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/LS", true)
-    getParent()?.getCommon()?.writeSettingAction("btn_on_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/ON", true)
-    getParent()?.getCommon()?.writeSettingAction("btn_off_url", shellyButtonNum, URL + "/button${inputNum.toInteger()}/OFF", true)
+    def actions = getParent()?.getCommon()?.readSettingAction()?.actions
+    
+    // don't overwrite existing URLs, in case they were important to the user
+    def existingUrls = actions?.getAt(name)?.getAt(shellyButtonNum)?.getAt("urls")    
+    if(!existingUrls?.contains(URL.toString()))
+    {
+        existingUrls += URL
+    }
+    
+    URL = existingUrls.collect{it}.join("&urls[]=")
+    
+    getParent()?.getCommon()?.writeSettingAction(name, shellyButtonNum, URL, true)
 }
 
 def parse(List<String> header)

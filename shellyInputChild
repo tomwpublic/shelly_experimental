@@ -29,10 +29,26 @@ def setupDetails(details)
 
 def setCallbackURLs(URL)
 {
-    getParent()?.getCommon()?.writeSettingAction("btn_on_url", inputNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("btn_off_url", inputNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("longpush_url", inputNum.toInteger(), URL, true)
-    getParent()?.getCommon()?.writeSettingAction("shortpush_url", inputNum.toInteger(), URL, true)
+    appendCallbackURLs("btn_on_url", URL)
+    appendCallbackURLs("btn_off_url", URL)
+    appendCallbackURLs("longpush_url", URL)
+    appendCallbackURLs("shortpush_url", URL)
+}
+
+def appendCallbackURLs(name, URL)
+{
+    def actions = getParent()?.getCommon()?.readSettingAction()?.actions
+    
+    // don't overwrite existing URLs, in case they were important to the user
+    def existingUrls = actions?.getAt(name)?.getAt(inputNum.toInteger())?.getAt("urls")
+    if(!existingUrls?.contains(URL.toString()))
+    {
+        existingUrls += URL
+    }
+    
+    URL = existingUrls.collect{it}.join("&urls[]=")
+    
+    getParent()?.getCommon()?.writeSettingAction(name, inputNum.toInteger(), URL, true)
 }
 
 def on()
