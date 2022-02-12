@@ -199,6 +199,11 @@ def writeSetting(setting, value)
     }            
 }
 
+def readSettingAction()
+{
+    return httpExec("GET", getParams(getBaseURI() + "settings/actions"))
+}
+
 def writeSettingAction(action, index, url, enable)
 {
     return httpExec("GET", getParams(getBaseURI() + "settings/actions?index=${index.toString()}&name=${action}&enabled=${enable ? "true" : "false"}&urls[]=${url}"))
