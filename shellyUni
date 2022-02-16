@@ -12,6 +12,7 @@ metadata
         capability "Refresh"
         
         command "disableLogin"
+        command "setRefreshInterval", ["seconds"]
         
         attribute "extTempSensorValue", "number"
         attribute "extTempSensorPresent", "string"
@@ -177,6 +178,11 @@ def uninstalled()
 def disableLogin()
 {
     getCommon()?.disableLogin()
+}
+
+def setRefreshInterval(seconds)
+{
+    device.updateSetting("refreshInterval", seconds.toLong())
 }
 
 def createAndConfigCommon()
